@@ -1,65 +1,106 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malkafa | Heritage Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #D4AF37; --dark-bg: #0A0A0B; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: #E2E2E2; }
+        .serif { font-family: 'Cinzel', serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-gold { background-color: var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transition: all 0.3s ease; }
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, var(--dark-bg) 80%); z-index: -1; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
 
-const ARCHEO_STORY = [
-  { era: 'M.Ö. 450', title: 'Tapınak İnşası', description: 'Bu dönemde sütunlar antik tekniklerle yerleştirildi.', audioGuide: 'era1.mp3' },
-  { era: 'M.S. 120', title: 'Roma Dönemi Genişlemesi', description: 'Kent merkezi yeni hamamlar ve tiyatro ile büyütüldü.', audioGuide: 'era2.mp3' },
-  { era: '1990', title: 'İlk Modern Kazılar', description: 'Arkeologlar ana sunağı bu tarihte gün yüzüne çıkardı.', audioGuide: 'era3.mp3' },
-  { era: 'Bugün', title: 'Restorasyon Süreci', description: 'Dijital tarama teknolojileriyle eserler korunuyor.', audioGuide: 'era4.mp3' },
-];
+    <div class="bg-overlay"></div>
 
-export default function TimelineApp() {
-  const [selectedEra, setSelectedEra] = useState(0);
-
-  return (
-    <View style={styles.container}>
-      {/* Üst Kısım: İnteraktif Zaman Çizelgesi */}
-      <View style={styles.timelineContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timelineHeader}>
-          {ARCHEO_STORY.map((item, index) => (
-            <TouchableOpacity key={index} onPress={() => setSelectedEra(index)} style={[styles.eraDot, selectedEra === index && styles.activeEraDot]}>
-              <Text style={[styles.eraText, selectedEra === index && styles.activeEraText]}>{item.era}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* Orta Kısım: Eğitim İçeriği Kartı */}
-      <View style={styles.contentCard}>
-        <Text style={styles.eraBadge}>Dönem: {ARCHEO_STORY[selectedEra].era}</Text>
-        <Text style={styles.title}>{ARCHEO_STORY[selectedEra].title}</Text>
-        <Text style={styles.description}>{ARCHEO_STORY[selectedEra].description}</Text>
+    <header class="p-6 flex justify-between items-center border-b border-white/5 relative z-10">
+        <div>
+            <h1 class="serif text-2xl tracking-widest text-[#D4AF37]">MALKAFA</h1>
+            <p id="nav-sub" class="text-[10px] tracking-[0.3em] uppercase opacity-50">İnteraktif Eğitim Sistemleri</p>
+        </div>
         
-        {/* Sesli Rehber (Eğitim Amaçlı Anlatım) */}
-        <TouchableOpacity style={styles.audioButton}>
-          <Text style={styles.audioButtonText}>🎧 Uzman Anlatımını Dinle</Text>
-        </TouchableOpacity>
-      </View>
+        <div class="flex gap-2">
+            <button onclick="changeLang('tr')" class="px-2 py-1 text-xs glass-panel rounded hover:text-[#D4AF37]">TR</button>
+            <button onclick="changeLang('en')" class="px-2 py-1 text-xs glass-panel rounded hover:text-[#D4AF37]">EN</button>
+            <button onclick="changeLang('gr')" class="px-2 py-1 text-xs glass-panel rounded hover:text-[#D4AF37]">GR</button>
+        </div>
+    </header>
 
-      {/* Alt Kısım: "Bunu Biliyor Muydunuz?" (Eğitim Katmanı) */}
-      <View style={styles.factBox}>
-        <Text style={styles.factTitle}>💡 Arkeolojik Detay</Text>
-        <Text style={styles.factText}>Bu bölgedeki kazılarda kullanılan teknikler, çevredeki diğer alanlardan %30 daha eskidir.</Text>
-      </View>
-    </View>
-  );
-}
+    <main class="flex-1 flex flex-col lg:flex-row p-6 lg:p-12 gap-8 relative z-10">
+        <section class="lg:w-3/5 flex flex-col justify-center">
+            <span id="hero-tag" class="text-[#D4AF37] text-sm font-bold tracking-widest mb-2 uppercase">Bölüm: Samothraki Kazıları</span>
+            <h2 id="hero-title" class="serif text-5xl lg:text-7xl mb-6 leading-tight">Zamanın Katmanlarını Keşfedin</h2>
+            <p id="hero-desc" class="text-lg text-gray-400 max-w-xl leading-relaxed mb-10">
+                Bu modül, Helenistik dönemin mimari sırlarını ve kazı alanındaki verileri interaktif olarak sunar.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <button id="btn-audio" class="btn-gold text-black px-10 py-4 rounded-full font-extrabold">SESLİ REHBERİ BAŞLAT</button>
+                <button id="btn-doc" class="glass-panel px-10 py-4 rounded-full font-bold">EĞİTİM DOSYALARI</button>
+            </div>
+        </section>
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfaf5', paddingTop: 60 }, // Müze kağıdı rengi
-  timelineContainer: { height: 80, borderBottomWidth: 1, borderColor: '#e0d6c5' },
-  timelineHeader: { paddingHorizontal: 20, alignItems: 'center' },
-  eraDot: { paddingHorizontal: 20, paddingVertical: 10, marginRight: 15, borderRadius: 20, backgroundColor: '#eee' },
-  activeEraDot: { backgroundColor: '#8b5a2b' }, // Toprak rengi
-  eraText: { color: '#888', fontWeight: 'bold' },
-  activeEraText: { color: '#fff' },
-  contentCard: { margin: 20, padding: 25, backgroundColor: '#fff', borderRadius: 20, elevation: 10 },
-  eraBadge: { color: '#8b5a2b', fontWeight: 'bold', marginBottom: 10 },
-  title: { fontSize: 26, fontWeight: 'bold', color: '#333', marginBottom: 15 },
-  description: { fontSize: 16, lineHeight: 24, color: '#666' },
-  audioButton: { marginTop: 25, backgroundColor: '#2c3e50', padding: 15, borderRadius: 12, alignItems: 'center' },
-  audioButtonText: { color: '#fff', fontWeight: 'bold' },
-  factBox: { margin: 20, padding: 15, backgroundColor: '#e8f4f8', borderRadius: 10, borderLeftWidth: 5, borderColor: '#3498db' },
-  factTitle: { fontWeight: 'bold', color: '#2980b9', marginBottom: 5 },
-  factText: { color: '#444', fontStyle: 'italic' }
-});
+        <section class="lg:w-2/5 flex flex-col gap-4">
+            <div class="glass-panel p-6 rounded-3xl">
+                <h3 id="mod-title" class="text-sm font-bold text-[#D4AF37] mb-4 uppercase tracking-widest text-center">Aktif Modüller</h3>
+                <div class="space-y-3">
+                    <div class="p-4 rounded-2xl bg-white/10 border border-[#D4AF37]/30">
+                        <h4 id="mod-item-1" class="font-semibold text-center">Samothraki Sunağı Tarihçesi</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const translations = {
+            tr: {
+                navSub: "İnteraktif Eğitim Sistemleri",
+                heroTag: "Bölüm: Samothraki Kazıları",
+                heroTitle: "Zamanın Katmanlarını Keşfedin",
+                heroDesc: "Bu modül, Helenistik dönemin mimari sırlarını ve kazı alanındaki verileri interaktif olarak sunar.",
+                btnAudio: "SESLİ REHBERİ BAŞLAT",
+                btnDoc: "EĞİTİM DOSYALARI",
+                modTitle: "Aktif Modüller",
+                modItem1: "Samothraki Sunağı Tarihçesi"
+            },
+            en: {
+                navSub: "Interactive Education Systems",
+                heroTag: "Chapter: Samothraki Excavations",
+                heroTitle: "Discover the Layers of Time",
+                heroDesc: "This module presents the architectural secrets of the Hellenistic period and excavation data interactively.",
+                btnAudio: "START AUDIO GUIDE",
+                btnDoc: "EDUCATION FILES",
+                modTitle: "Active Modules",
+                modItem1: "History of Samothrace Altar"
+            },
+            gr: {
+                navSub: "Διαδραστικά Εκπαιδευτικά Συστήματα",
+                heroTag: "Κεφάλαιο: Ανασκαφές Σαμοθράκης",
+                heroTitle: "Ανακαλύψτε τα Στρώματα του Χρόνου",
+                heroDesc: "Αυτή η ενότητα παρουσιάζει τα αρχιτεκτονικά μυστικά της Ελληνιστικής περιόδου και τα δεδομένα ανασκαφών διαδραστικά.",
+                btnAudio: "ΕΝΑΡΞΗ ΑΚΟΥΣΤΙΚΟΥ ΟΔΗΓΟΥ",
+                btnDoc: "ΕΚΠΑΙΔΕΥΤΙΚΑ ΑΡΧΕΙΑ",
+                modTitle: "Ενεργές Ενότητες",
+                modItem1: "Ιστορία του Βωμού της Σαμοθράκης"
+            }
+        };
+
+        function changeLang(lang) {
+            document.getElementById('nav-sub').innerText = translations[lang].navSub;
+            document.getElementById('hero-tag').innerText = translations[lang].heroTag;
+            document.getElementById('hero-title').innerText = translations[lang].heroTitle;
+            document.getElementById('hero-desc').innerText = translations[lang].heroDesc;
+            document.getElementById('btn-audio').innerText = translations[lang].btnAudio;
+            document.getElementById('btn-doc').innerText = translations[lang].btnDoc;
+            document.getElementById('mod-title').innerText = translations[lang].modTitle;
+            document.getElementById('mod-item-1').innerText = translations[lang].modItem1;
+        }
+    </script>
+</body>
+</html>
