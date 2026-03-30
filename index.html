@@ -1,114 +1,93 @@
 import React, { useState } from 'react';
 import { 
   StyleSheet, Text, View, TouchableOpacity, 
-  ScrollView, SafeAreaView, Dimensions, StatusBar, Image, Animated
+  ScrollView, SafeAreaView, Dimensions, StatusBar 
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-// MALKAFA PREMIUM RENK PALETİ
-const COLORS = {
-  bg: '#0F051D',          // Koyu Mor / Gece
-  panel: '#1A0B2E',       // Kart Arka Planı
-  gold: '#FFD700',        // Altın Vurgu
-  goldGlow: 'rgba(255, 215, 0, 0.3)',
-  textMain: '#FFFFFF',
-  textSub: '#A594C1',
-  border: 'rgba(255, 215, 0, 0.2)'
+// MALKAFA PREMIUM TASARIM SİSTEMİ
+const THEME = {
+  dark: '#0A0414',
+  purple: '#1F0B42',
+  gold: '#FFD700',
+  goldGlow: 'rgba(255, 214, 0, 0.4)',
+  white: '#FFFFFF',
+  gray: '#A094B1',
 };
 
-// TÜM İÇERİK VERİSİ (LİNKTEKİ EKSİKSİZ YAPI)
-const DATA = {
-  roles: [
-    { 
-      id: 'arkeolog', name: 'Arkeolog', icon: '🏛️', 
-      tabs: [
-        { title: 'Arkeolog', content: 'Arkeolog, yeryüzündeki veya su altındaki eski uygarlıklara ait kalıntıları inceleyerek geçmişi gün ışığına çıkarır. Antikythera batığında bulunan eserlerin tarihsel önemini belirleyen ana kişidir.' },
-        { title: 'Dönem (M.Ö. 75-50)', content: 'Gemi, M.Ö. 1. yüzyıl ortalarında Roma’ya lüks eşyalar taşırken battı. Akdeniz’in o dönemdeki siyasi ve ekonomik gücünü temsil eder.' },
-        { title: 'Çıkarma (1900-1901)', content: 'Batık, Simi adasından sünger dalgıçları tarafından bulundu. 1900 yılında başlayan ilk bilimsel su altı kazısı olarak tarihe geçti.' },
-        { title: 'Kullanım', content: 'Mekanizma, gökyüzündeki olayları, tutulmaları ve Olimpiyat oyunlarının zamanını hesaplamak için kullanılan antik bir analog bilgisayardır.' }
-      ]
-    },
-    { 
-      id: 'dalis', name: 'Dalgıç', icon: '🤿', 
-      tabs: [
-        { title: 'Dalgıçlık', content: 'Antikythera dalgıçları, o dönemin kısıtlı imkanlarıyla (ağır metal başlıklar) 60 metre derinliğe inerek inanılmaz bir cesaret sergilediler.' },
-        { title: 'Ekipman', content: 'Eski tip hava pompalı kıyafetler kullanıldı. Bugün ise ileri teknoloji robotlar ve karışım gazlı tüplerle keşif devam ediyor.' }
-      ]
-    },
-    { 
-      id: 'konservator', name: 'Konservatör', icon: '🧪', 
-      tabs: [
-        { title: 'Konservasyon', content: 'Denizden çıkan eserlerin korozyona uğramaması için tuzdan arındırma ve kimyasal stabilizasyon süreçlerini yönetir.' },
-        { title: 'Restorasyon', content: 'Parçalanmış dişlileri mikroskop altında birleştirerek mekanizmanın formunu korumaya çalışır.' }
-      ]
-    },
-    { 
-      id: 'tarihci', name: 'Tarihçi', icon: '📜', 
-      tabs: [
-        { title: 'Yazıtlar', content: 'Mekanizma üzerindeki 3500’den fazla Yunanca karakteri okuyarak cihazın kullanım kılavuzunu çözer.' },
-        { title: 'Kültürel Miras', content: 'Yunan matematiği ve astronomisinin ulaştığı inanılmaz seviyeyi dünyaya anlatır.' }
-      ]
-    },
-    { 
-      id: 'muhendis', name: 'Mühendis', icon: '⚙️', 
-      tabs: [
-        { title: 'Mekanizma', content: '30’dan fazla bronz dişlinin nasıl birleştiğini ve Ay’ın hareketlerini nasıl milimetrik hesapladığını modeller.' },
-        { title: 'Analiz', content: 'Modern X-Ray (BT) taramalarıyla mekanizmanın iç yapısını bilgisayar ortamında yeniden canlandırır.' }
-      ]
-    },
-    { 
-      id: 'gazeteci', name: 'Gazeteci', icon: '🎤', 
-      tabs: [
-        { title: 'Haberleştirme', content: '1902’den bugüne bu keşfin dünya basınındaki yankısını ve bilimsel devrimini halka aktarır.' }
-      ]
-    }
-  ]
-};
+// LİNKTEKİ EKSİKSİZ TÜM VERİLER
+const CONTENT = [
+  { 
+    id: 1, name: 'Arkeolog', icon: '🏛️',
+    sections: [
+      { title: 'Arkeolog', text: 'Arkeolog, yeryüzündeki veya su altındaki uygarlık kalıntılarını inceleyerek geçmişi gün ışığına çıkarır.' },
+      { title: 'Dönem', text: 'M.Ö. 75-50 arası. Gemi Roma’ya lüks eşyalar taşırken Antikythera yakınlarında battı.' },
+      { title: 'Anelksusi (Çıkarma)', text: '1900-1901’de Simi adasından sünger dalgıçları tarafından tesadüfen bulundu.' },
+      { title: 'Kullanım', text: 'Gök cisimlerinin konumunu ve tutulmaları hesaplayan dünyanın ilk analog bilgisayarıdır.' }
+    ]
+  },
+  { 
+    id: 2, name: 'Dalgıç', icon: '🤿',
+    sections: [
+      { title: 'Dalış Süreci', text: '60 metre derinlikte, o dönemin kısıtlı teknolojisiyle yapılan inanılmaz bir su altı operasyonudur.' },
+      { title: 'Buluntular', text: 'Sadece mekanizma değil, devasa mermer heykeller ve bronz eserler de çıkarılmıştır.' }
+    ]
+  },
+  { 
+    id: 3, name: 'Konservatör', icon: '🧪',
+    sections: [
+      { title: 'Koruma', text: 'Eserlerin deniz tuzundan ve korozyondan arındırılması için uygulanan hassas laboratuvar çalışmalarıdır.' }
+    ]
+  },
+  { 
+    id: 4, name: 'Tarihçi', icon: '📜',
+    sections: [
+      { title: 'Yazıtlar', text: 'Mekanizma üzerindeki 3500’den fazla karakterin deşifre edilmesiyle cihazın işlevi kanıtlanmıştır.' }
+    ]
+  },
+  { 
+    id: 5, name: 'Mühendis', icon: '⚙️',
+    sections: [
+      { title: 'Dişli Sistemi', text: '30’dan fazla bronz dişlinin nasıl birleştiği modern BT taramalarıyla çözülmüştür.' }
+    ]
+  },
+  { 
+    id: 6, name: 'Gazeteci', icon: '🎤',
+    sections: [
+      { title: 'Duyuru', text: 'Keşfin 1902’de basına sızmasından bugüne dünya genelindeki yankıları kapsar.' }
+    ]
+  }
+];
 
-export default function AntikytheraFullApp() {
-  const [currentView, setCurrentView] = useState('intro'); // intro, menu, detail
-  const [selectedRole, setSelectedRole] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
+export default function AntikytheraApp() {
+  const [view, setView] = useState('intro');
+  const [selected, setSelected] = useState(null);
+  const [openSection, setOpenSection] = useState(null);
 
   // --- EKRAN 1: GİRİŞ ---
-  const IntroScreen = () => (
-    <LinearGradient colors={[COLORS.bg, '#25104A']} style={styles.flexCenter}>
-      <View style={styles.mainCircle}>
-        <Text style={{fontSize: 60}}>⚙️</Text>
-      </View>
-      <Text style={styles.titleLg}>ANTIKYTHERA</Text>
-      <Text style={styles.descText}>Mekanizmanın Gizemlerine Yolculuk</Text>
-      <TouchableOpacity 
-        style={styles.btnGold} 
-        onPress={() => setCurrentView('menu')}
-      >
-        <Text style={styles.btnText}>GİRİŞ YAP</Text>
+  if (view === 'intro') return (
+    <LinearGradient colors={[THEME.dark, THEME.purple]} style={styles.center}>
+      <View style={styles.logoCircle}><Text style={{fontSize: 50}}>⚙️</Text></View>
+      <Text style={styles.brand}>ANTIKYTHERA</Text>
+      <Text style={styles.tagline}>Mekanizmanın Gizemini Çözün</Text>
+      <TouchableOpacity style={styles.mainBtn} onPress={() => setView('menu')}>
+        <Text style={styles.btnText}>BAŞLA</Text>
       </TouchableOpacity>
-      <View style={styles.langRow}>
-        <Text style={styles.langText}>Türkçe</Text>
-        <Text style={[styles.langText, {opacity: 0.5}]}>English</Text>
-      </View>
     </LinearGradient>
   );
 
   // --- EKRAN 2: ANA MENÜ ---
-  const MenuScreen = () => (
+  if (view === 'menu') return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{padding: 20}}>
-        <Text style={styles.menuHeader}>Bir Uzmanlık Seç</Text>
+        <Text style={styles.headerTitle}>Bir Rol Seçin</Text>
         <View style={styles.grid}>
-          {DATA.roles.map((item) => (
-            <TouchableOpacity 
-              key={item.id} 
-              style={styles.menuItem}
-              onPress={() => { setSelectedRole(item); setActiveTab(0); setCurrentView('detail'); }}
-            >
-              <View style={styles.itemCircle}>
-                <Text style={{fontSize: 35}}>{item.icon}</Text>
-              </View>
-              <Text style={styles.itemName}>{item.name}</Text>
+          {CONTENT.map(item => (
+            <TouchableOpacity key={item.id} style={styles.card} onPress={() => { setSelected(item); setView('detail'); setOpenSection(0); }}>
+              <View style={styles.cardIcon}><Text style={{fontSize: 30}}>{item.icon}</Text></View>
+              <Text style={styles.cardName}>{item.name}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -116,42 +95,28 @@ export default function AntikytheraFullApp() {
     </SafeAreaView>
   );
 
-  // --- EKRAN 3: DETAYLAR VE AKORDEON ---
-  const DetailScreen = () => (
+  // --- EKRAN 3: DETAY ---
+  return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.detailHeader}>
-        <TouchableOpacity onPress={() => setCurrentView('menu')}>
-          <Text style={styles.goldText}>← Menü</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{selectedRole.name}</Text>
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => setView('menu')}><Text style={styles.goldLink}>← Geri</Text></TouchableOpacity>
+        <Text style={styles.topBarTitle}>{selected.name}</Text>
         <View style={{width: 40}} />
       </View>
-
-      <ScrollView contentContainerStyle={{padding: 20}}>
+      <ScrollView style={{padding: 20}}>
         <View style={styles.detailHero}>
-           <View style={styles.heroCircle}>
-              <Text style={{fontSize: 50}}>{selectedRole.icon}</Text>
-           </View>
+          <View style={styles.heroCircle}><Text style={{fontSize: 45}}>{selected.icon}</Text></View>
         </View>
-
-        {selectedRole.tabs.map((tab, index) => (
-          <View key={index} style={styles.accordionBox}>
-            <TouchableOpacity 
-              style={styles.accordionHeader}
-              onPress={() => setActiveTab(activeTab === index ? -1 : index)}
-            >
-              <Text style={styles.tabTitle}>{tab.title.toUpperCase()}</Text>
-              <Text style={styles.goldText}>{activeTab === index ? '▲' : '▼'}</Text>
+        {selected.sections.map((s, i) => (
+          <View key={i} style={styles.accordion}>
+            <TouchableOpacity style={styles.accHeader} onPress={() => setOpenSection(openSection === i ? null : i)}>
+              <Text style={styles.accTitle}>{s.title.toUpperCase()}</Text>
+              <Text style={styles.goldLink}>{openSection === i ? '▲' : '▼'}</Text>
             </TouchableOpacity>
-            
-            {activeTab === index && (
-              <View style={styles.accordionContent}>
-                <Text style={styles.tabContentText}>{tab.content}</Text>
-                {index === 1 && ( // Eğer 'Dönem' seçiliyse temsili buton ekle
-                  <TouchableOpacity style={styles.miniBtn}>
-                    <Text style={styles.miniBtnText}>AS PAIZOUME (OYNA)</Text>
-                  </TouchableOpacity>
-                )}
+            {openSection === i && (
+              <View style={styles.accBody}>
+                <Text style={styles.accText}>{s.text}</Text>
+                {i === 1 && <TouchableOpacity style={styles.playBtn}><Text style={styles.playText}>OYNA (AS PAIZOUME)</Text></TouchableOpacity>}
               </View>
             )}
           </View>
@@ -159,76 +124,31 @@ export default function AntikytheraFullApp() {
       </ScrollView>
     </SafeAreaView>
   );
-
-  return (
-    <View style={{flex: 1, backgroundColor: COLORS.bg}}>
-      <StatusBar barStyle="light-content" />
-      {currentView === 'intro' && <IntroScreen />}
-      {currentView === 'menu' && <MenuScreen />}
-      {currentView === 'detail' && <DetailScreen />}
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
-  flexCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 },
-  
-  // Intro
-  mainCircle: {
-    width: 140, height: 140, borderRadius: 70, backgroundColor: COLORS.panel,
-    borderWidth: 3, borderColor: COLORS.gold, alignItems: 'center', justifyContent: 'center',
-    marginBottom: 20, shadowColor: COLORS.gold, shadowOpacity: 0.5, shadowRadius: 20, elevation: 15
-  },
-  titleLg: { color: COLORS.gold, fontSize: 36, fontWeight: '900', letterSpacing: 5 },
-  descText: { color: COLORS.textSub, fontSize: 16, marginTop: 10, marginBottom: 40 },
-  btnGold: {
-    backgroundColor: COLORS.gold, paddingVertical: 15, paddingHorizontal: 50, borderRadius: 40,
-    shadowColor: COLORS.gold, shadowOpacity: 0.4, shadowRadius: 10
-  },
-  btnText: { color: COLORS.bg, fontWeight: 'bold', fontSize: 18 },
-  langRow: { flexDirection: 'row', marginTop: 30 },
-  langText: { color: COLORS.textMain, marginHorizontal: 15, fontWeight: '600' },
-
-  // Menu
-  menuHeader: { color: COLORS.textMain, fontSize: 24, fontWeight: 'bold', marginVertical: 20, textAlign: 'center' },
+  container: { flex: 1, backgroundColor: THEME.dark },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  logoCircle: { width: 120, height: 120, borderRadius: 60, backgroundColor: THEME.purple, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: THEME.gold, elevation: 10 },
+  brand: { color: THEME.gold, fontSize: 32, fontWeight: 'bold', letterSpacing: 4, marginTop: 20 },
+  tagline: { color: THEME.gray, fontSize: 14, marginTop: 5 },
+  mainBtn: { backgroundColor: THEME.gold, paddingVertical: 15, paddingHorizontal: 60, borderRadius: 30, marginTop: 40 },
+  btnText: { color: THEME.dark, fontWeight: 'bold', fontSize: 16 },
+  headerTitle: { color: THEME.white, fontSize: 22, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  menuItem: {
-    width: (width / 2) - 30, backgroundColor: COLORS.panel, borderRadius: 25,
-    padding: 20, alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: COLORS.border
-  },
-  itemCircle: {
-    width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.bg,
-    alignItems: 'center', justifyContent: 'center', marginBottom: 12,
-    borderWidth: 1, borderColor: 'rgba(255,215,0,0.1)'
-  },
-  itemName: { color: COLORS.textMain, fontWeight: '700', fontSize: 16 },
-
-  // Detail
-  detailHeader: { 
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
-    padding: 20, borderBottomWidth: 1, borderBottomColor: COLORS.border 
-  },
-  headerTitle: { color: COLORS.textMain, fontSize: 20, fontWeight: 'bold' },
-  goldText: { color: COLORS.gold, fontWeight: 'bold' },
-  detailHero: { alignItems: 'center', marginVertical: 30 },
-  heroCircle: {
-    width: 120, height: 120, borderRadius: 60, backgroundColor: COLORS.panel,
-    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: COLORS.gold,
-    shadowColor: COLORS.gold, shadowOpacity: 0.3, shadowRadius: 15
-  },
-  accordionBox: { backgroundColor: COLORS.panel, borderRadius: 15, marginBottom: 10, overflow: 'hidden' },
-  accordionHeader: { 
-    flexDirection: 'row', justifyContent: 'space-between', padding: 20, 
-    alignItems: 'center', borderBottomWidth: 0.5, borderBottomColor: 'rgba(255,255,255,0.05)' 
-  },
-  tabTitle: { color: COLORS.gold, fontWeight: '800', fontSize: 14, letterSpacing: 1 },
-  accordionContent: { padding: 20, backgroundColor: 'rgba(0,0,0,0.2)' },
-  tabContentText: { color: COLORS.textSub, lineHeight: 24, fontSize: 16 },
-  miniBtn: { 
-    marginTop: 20, backgroundColor: 'transparent', borderWidth: 1, borderColor: COLORS.gold, 
-    padding: 12, borderRadius: 10, alignItems: 'center' 
-  },
-  miniBtnText: { color: COLORS.gold, fontWeight: 'bold', fontSize: 12 }
+  card: { width: (width/2)-30, backgroundColor: THEME.purple, padding: 20, borderRadius: 20, alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,215,0,0.2)' },
+  cardIcon: { width: 70, height: 70, borderRadius: 35, backgroundColor: THEME.dark, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  cardName: { color: THEME.white, fontWeight: 'bold' },
+  topBar: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#333' },
+  topBarTitle: { color: THEME.white, fontSize: 18, fontWeight: 'bold' },
+  goldLink: { color: THEME.gold, fontWeight: 'bold' },
+  detailHero: { alignItems: 'center', padding: 30 },
+  heroCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: THEME.purple, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: THEME.gold },
+  accordion: { backgroundColor: '#16082A', borderRadius: 12, marginBottom: 12, overflow: 'hidden' },
+  accHeader: { flexDirection: 'row', justifyContent: 'space-between', padding: 18, alignItems: 'center' },
+  accTitle: { color: THEME.gold, fontSize: 13, fontWeight: '800' },
+  accBody: { padding: 18, paddingTop: 0 },
+  accText: { color: THEME.gray, lineHeight: 22 },
+  playBtn: { marginTop: 15, borderWidth: 1, borderColor: THEME.gold, padding: 10, borderRadius: 8, alignItems: 'center' },
+  playText: { color: THEME.gold, fontSize: 12, fontWeight: 'bold' }
 });
-          
