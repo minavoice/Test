@@ -3,91 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malkafa | Heritage Systems</title>
+    <title>Olga test | Antikythera Mechanism Experience</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --dark-bg: #0A0A0B; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: #E2E2E2; }
+        :root { 
+            --bronze: #8b7355; 
+            --oxide-green: #2d5a4c;
+            --dark-bg: #050a09; 
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: #d1d5db; }
         .serif { font-family: 'Cinzel', serif; }
-        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .btn-gold { background-color: var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transition: all 0.3s ease; }
-        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, var(--dark-bg) 80%); z-index: -1; }
+        .glass-panel { background: rgba(45, 90, 76, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(139, 115, 85, 0.2); }
+        .btn-bronze { 
+            background: linear-gradient(135deg, #8b7355 0%, #5d4d39 100%); 
+            box-shadow: 0 0 20px rgba(139, 115, 85, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-bronze:hover { transform: translateY(-3px); box-shadow: 0 5px 25px rgba(139, 115, 85, 0.5); }
+        .timeline-active { background: var(--bronze); box-shadow: 0 0 15px var(--bronze); }
+        /* Arkaplan efekti: Batık hissi */
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(45, 90, 76, 0.15) 0%, var(--dark-bg) 85%);
+            z-index: -1;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col overflow-x-hidden">
 
     <div class="bg-overlay"></div>
 
     <header class="p-6 flex justify-between items-center border-b border-white/5 relative z-10">
         <div>
-            <h1 class="serif text-2xl tracking-widest text-[#D4AF37]">MALKAFA</h1>
-            <p id="nav-sub" class="text-[10px] tracking-[0.3em] uppercase opacity-50">İnteraktif Eğitim Sistemleri</p>
+            <h1 class="serif text-2xl tracking-[0.2em] text-[#8b7355]">MALKAFA</h1>
+            <p id="nav-sub" class="text-[9px] tracking-[0.4em] uppercase opacity-40">Antikythera Interactive Module</p>
         </div>
         
-        <div class="flex gap-2">
-            <button onclick="changeLang('tr')" class="px-2 py-1 text-xs glass-panel rounded hover:text-[#D4AF37]">TR</button>
-            <button onclick="changeLang('en')" class="px-2 py-1 text-xs glass-panel rounded hover:text-[#D4AF37]">EN</button>
-            <button onclick="changeLang('gr')" class="px-2 py-1 text-xs glass-panel rounded hover:text-[#D4AF37]">GR</button>
+        <div class="flex gap-3">
+            <button onclick="changeLang('tr')" class="px-3 py-1 text-[10px] glass-panel rounded-full hover:border-[#8b7355] transition">TR</button>
+            <button onclick="changeLang('en')" class="px-3 py-1 text-[10px] glass-panel rounded-full hover:border-[#8b7355] transition">EN</button>
+            <button onclick="changeLang('gr')" class="px-3 py-1 text-[10px] glass-panel rounded-full hover:border-[#8b7355] transition">GR</button>
         </div>
     </header>
 
-    <main class="flex-1 flex flex-col lg:flex-row p-6 lg:p-12 gap-8 relative z-10">
+    <main class="flex-1 flex flex-col lg:flex-row p-6 lg:p-16 gap-12 relative z-10">
+        
         <section class="lg:w-3/5 flex flex-col justify-center">
-            <span id="hero-tag" class="text-[#D4AF37] text-sm font-bold tracking-widest mb-2 uppercase">Bölüm: Samothraki Kazıları</span>
-            <h2 id="hero-title" class="serif text-5xl lg:text-7xl mb-6 leading-tight">Zamanın Katmanlarını Keşfedin</h2>
-            <p id="hero-desc" class="text-lg text-gray-400 max-w-xl leading-relaxed mb-10">
-                Bu modül, Helenistik dönemin mimari sırlarını ve kazı alanındaki verileri interaktif olarak sunar.
+            <div class="inline-block px-3 py-1 glass-panel rounded-md mb-4">
+                <span id="hero-tag" class="text-[#8b7355] text-[11px] font-bold tracking-widest uppercase">M.Ö. 150 - Antik Astronomi</span>
+            </div>
+            <h2 id="hero-title" class="serif text-4xl lg:text-7xl mb-6 leading-[1.1] text-gray-100">Antikythera Dünyasına Yolculuk</h2>
+            <p id="hero-desc" class="text-lg text-gray-400 max-w-xl leading-relaxed mb-10 italic">
+                "Batık bir gemiden çıkan 2000 yıllık bir mucize. Dünyanın ilk bilgisayarının dişlileri arasında tarihin derinliklerini keşfedin."
             </p>
+            
             <div class="flex flex-wrap gap-4">
-                <button id="btn-audio" class="btn-gold text-black px-10 py-4 rounded-full font-extrabold">SESLİ REHBERİ BAŞLAT</button>
-                <button id="btn-doc" class="glass-panel px-10 py-4 rounded-full font-bold">EĞİTİM DOSYALARI</button>
+                <button id="btn-audio" class="btn-bronze text-white px-10 py-4 rounded-full font-bold tracking-wide uppercase text-sm">SESLİ REHBERİ DİNLE</button>
+                <button id="btn-doc" class="glass-panel px-10 py-4 rounded-full font-bold text-sm hover:bg-white/5 transition">KAZI RAPORLARI</button>
             </div>
         </section>
 
-        <section class="lg:w-2/5 flex flex-col gap-4">
-            <div class="glass-panel p-6 rounded-3xl">
-                <h3 id="mod-title" class="text-sm font-bold text-[#D4AF37] mb-4 uppercase tracking-widest text-center">Aktif Modüller</h3>
-                <div class="space-y-3">
-                    <div class="p-4 rounded-2xl bg-white/10 border border-[#D4AF37]/30">
-                        <h4 id="mod-item-1" class="font-semibold text-center">Samothraki Sunağı Tarihçesi</h4>
+        <section class="lg:w-2/5 flex flex-col gap-6">
+            <div class="glass-panel p-8 rounded-[2rem] border-l-4 border-l-[#8b7355]">
+                <h3 id="mod-title" class="text-xs font-bold text-[#8b7355] mb-6 uppercase tracking-[0.2em]">Eğitim İçeriği</h3>
+                <div class="space-y-4">
+                    <div class="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#8b7355]/40 transition group cursor-pointer">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] text-[#8b7355] font-mono">STEP 01</span>
+                            <span class="text-[10px] opacity-40">4:20</span>
+                        </div>
+                        <h4 id="mod-item-1" class="font-semibold text-gray-200 group-hover:text-white">Batık Geminin Keşfi</h4>
+                    </div>
+                    <div class="p-5 rounded-2xl bg-white/10 border border-[#8b7355]/60 transition group cursor-pointer">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] text-[#8b7355] font-mono">STEP 02</span>
+                            <span class="text-[10px] text-green-500 uppercase font-bold">Aktif</span>
+                        </div>
+                        <h4 id="mod-item-2" class="font-semibold text-gray-200 group-hover:text-white">Dişlilerin Gizemi: Mekanizma</h4>
                     </div>
                 </div>
+            </div>
+
+            <div class="p-6 rounded-2xl bg-[#2d5a4c]/10 border border-[#2d5a4c]/30">
+                <p id="fact-text" class="text-sm text-[#2d5a4c] font-medium leading-relaxed">
+                    Bu modül, Antikythera batığından çıkarılan eserlerin restorasyon sürecini ve astronomik hesaplamalarını öğretmek amacıyla hazırlanmıştır.
+                </p>
             </div>
         </section>
     </main>
 
+    <footer class="p-8 border-t border-white/5">
+        <div class="max-w-4xl mx-auto flex flex-col gap-4">
+            <div class="relative h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                <div class="absolute h-full w-1/2 bg-[#8b7355]"></div>
+            </div>
+            <div class="flex justify-between text-[10px] uppercase tracking-widest opacity-40">
+                <span>M.Ö. 150</span>
+                <span class="text-[#8b7355] opacity-100 font-bold">Keşif: 1901</span>
+                <span>Restorasyon</span>
+            </div>
+        </div>
+    </footer>
+
     <script>
         const translations = {
             tr: {
-                navSub: "İnteraktif Eğitim Sistemleri",
-                heroTag: "Bölüm: Samothraki Kazıları",
-                heroTitle: "Zamanın Katmanlarını Keşfedin",
-                heroDesc: "Bu modül, Helenistik dönemin mimari sırlarını ve kazı alanındaki verileri interaktif olarak sunar.",
-                btnAudio: "SESLİ REHBERİ BAŞLAT",
-                btnDoc: "EĞİTİM DOSYALARI",
-                modTitle: "Aktif Modüller",
-                modItem1: "Samothraki Sunağı Tarihçesi"
+                navSub: "Antikythera İnteraktif Modülü",
+                heroTag: "M.Ö. 150 - Antik Astronomi",
+                heroTitle: "Antikythera Dünyasına Yolculuk",
+                heroDesc: "Batık bir gemiden çıkan 2000 yıllık bir mucize. Dünyanın ilk bilgisayarının dişlileri arasında tarihin derinliklerini keşfedin.",
+                btnAudio: "SESLİ REHBERİ DİNLE",
+                btnDoc: "KAZI RAPORLARI",
+                modTitle: "Eğitim İçeriği",
+                modItem1: "Batık Geminin Keşfi",
+                modItem2: "Dişlilerin Gizemi: Mekanizma",
+                factText: "Bu modül, Antikythera batığından çıkarılan eserlerin restorasyon sürecini ve astronomik hesaplamalarını öğretmek amacıyla hazırlanmıştır."
             },
             en: {
-                navSub: "Interactive Education Systems",
-                heroTag: "Chapter: Samothraki Excavations",
-                heroTitle: "Discover the Layers of Time",
-                heroDesc: "This module presents the architectural secrets of the Hellenistic period and excavation data interactively.",
-                btnAudio: "START AUDIO GUIDE",
-                btnDoc: "EDUCATION FILES",
-                modTitle: "Active Modules",
-                modItem1: "History of Samothrace Altar"
+                navSub: "Antikythera Interactive Module",
+                heroTag: "150 B.C. - Ancient Astronomy",
+                heroTitle: "A Journey into Antikythera",
+                heroDesc: "A 2000-year-old miracle from a shipwreck. Explore the depths of history through the gears of the world's first computer.",
+                btnAudio: "LISTEN AUDIO GUIDE",
+                btnDoc: "EXCAVATION REPORTS",
+                modTitle: "Educational Content",
+                modItem1: "Discovery of the Shipwreck",
+                modItem2: "Mystery of Gears: The Mechanism",
+                factText: "This module is designed to teach the restoration process and astronomical calculations of artifacts recovered from the Antikythera shipwreck."
             },
             gr: {
-                navSub: "Διαδραστικά Εκπαιδευτικά Συστήματα",
-                heroTag: "Κεφάλαιο: Ανασκαφές Σαμοθράκης",
-                heroTitle: "Ανακαλύψτε τα Στρώματα του Χρόνου",
-                heroDesc: "Αυτή η ενότητα παρουσιάζει τα αρχιτεκτονικά μυστικά της Ελληνιστικής περιόδου και τα δεδομένα ανασκαφών διαδραστικά.",
-                btnAudio: "ΕΝΑΡΞΗ ΑΚΟΥΣΤΙΚΟΥ ΟΔΗΓΟΥ",
-                btnDoc: "ΕΚΠΑΙΔΕΥΤΙΚΑ ΑΡΧΕΙΑ",
-                modTitle: "Ενεργές Ενότητες",
-                modItem1: "Ιστορία του Βωμού της Σαμοθράκης"
+                navSub: "Διαδραστική Ενότητα Αντικυθήρων",
+                heroTag: "150 π.Χ. - Αρχαία Αστρονομία",
+                heroTitle: "Ταξίδι στον Κόσμο των Αντικυθήρων",
+                heroDesc: "Ένα θαύμα 2000 ετών από ένα ναυάγιο. Εξερευνήστε τα βάθη της ιστορίας μέσα από τα γρανάζια του πρώτου υπολογιστή στον κόσμο.",
+                btnAudio: "ΑΚΟΥΣΤΕ ΤΟΝ ΟΔΗΓΟ",
+                btnDoc: "ΑΝΑΦΟΡΕΣ ΑΝΑΣΚΑΦΗΣ",
+                modTitle: "Εκπαιδευτικό Περιεχόμενο",
+                modItem1: "Ανακάλυψη του Ναυαγίου",
+                modItem2: "Το Μυστήριο των Γρανάζιων: Ο Μηχανισμός",
+                factText: "Αυτή η ενότητα έχει σχεδιαστεί για να διδάξει τη διαδικασία αποκατάστασης και τους αστρονομικούς υπολογισμούς των ευρημάτων από το ναυάγιο των Αντικυθήρων."
             }
         };
 
@@ -100,6 +155,8 @@
             document.getElementById('btn-doc').innerText = translations[lang].btnDoc;
             document.getElementById('mod-title').innerText = translations[lang].modTitle;
             document.getElementById('mod-item-1').innerText = translations[lang].modItem1;
+            document.getElementById('mod-item-2').innerText = translations[lang].modItem2;
+            document.getElementById('fact-text').innerText = translations[lang].factText;
         }
     </script>
 </body>
