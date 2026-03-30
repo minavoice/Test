@@ -1,127 +1,234 @@
-<!DOCTYPE html>
-<html lang="el">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antikythera Mechanism | Interactive Experience</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --bronze: #b8860b; --oxide: #2d5a4c; --bg: #050808; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: #d1d5db; overflow: hidden; }
-        .serif { font-family: 'Cinzel', serif; }
-        
-        /* Arkaplan Dişli Animasyonu */
-        .gear-bg {
-            position: fixed; top: -10%; right: -10%; width: 600px; height: 600px;
-            border: 40px double rgba(184, 134, 11, 0.03); border-radius: 50%;
-            animation: rotate 60s linear infinite; z-index: -1;
-        }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+import React, { useState } from 'react';
+import { 
+  StyleSheet, Text, View, TouchableOpacity, 
+  ScrollView, SafeAreaView, Dimensions, StatusBar, Image, Animated
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-        /* Modern Modal (Açılır Pencere) */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .modal-content { background: #0c1212; border: 1px solid var(--bronze); width: 90%; max-width: 800px; border-radius: 20px; padding: 40px; transform: scale(0.9); transition: 0.3s; }
-        .modal.active { display: flex; }
-        .modal.active .modal-content { transform: scale(1); }
+const { width, height } = Dimensions.get('window');
 
-        .btn-main { 
-            background: linear-gradient(45deg, #8b7355, #b8860b);
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-            transition: 0.3s; font-weight: 800; color: black;
-        }
-        .btn-main:hover { transform: skewX(-5deg) scale(1.05); filter: brightness(1.2); }
-    </style>
-</head>
-<body class="min-h-screen">
+// MALKAFA PREMIUM RENK PALETİ
+const COLORS = {
+  bg: '#0F051D',          // Koyu Mor / Gece
+  panel: '#1A0B2E',       // Kart Arka Planı
+  gold: '#FFD700',        // Altın Vurgu
+  goldGlow: 'rgba(255, 215, 0, 0.3)',
+  textMain: '#FFFFFF',
+  textSub: '#A594C1',
+  border: 'rgba(255, 215, 0, 0.2)'
+};
 
-    <div class="gear-bg"></div>
-    <div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-30 z-[-1]"></div>
+// TÜM İÇERİK VERİSİ (LİNKTEKİ EKSİKSİZ YAPI)
+const DATA = {
+  roles: [
+    { 
+      id: 'arkeolog', name: 'Arkeolog', icon: '🏛️', 
+      tabs: [
+        { title: 'Arkeolog', content: 'Arkeolog, yeryüzündeki veya su altındaki eski uygarlıklara ait kalıntıları inceleyerek geçmişi gün ışığına çıkarır. Antikythera batığında bulunan eserlerin tarihsel önemini belirleyen ana kişidir.' },
+        { title: 'Dönem (M.Ö. 75-50)', content: 'Gemi, M.Ö. 1. yüzyıl ortalarında Roma’ya lüks eşyalar taşırken battı. Akdeniz’in o dönemdeki siyasi ve ekonomik gücünü temsil eder.' },
+        { title: 'Çıkarma (1900-1901)', content: 'Batık, Simi adasından sünger dalgıçları tarafından bulundu. 1900 yılında başlayan ilk bilimsel su altı kazısı olarak tarihe geçti.' },
+        { title: 'Kullanım', content: 'Mekanizma, gökyüzündeki olayları, tutulmaları ve Olimpiyat oyunlarının zamanını hesaplamak için kullanılan antik bir analog bilgisayardır.' }
+      ]
+    },
+    { 
+      id: 'dalis', name: 'Dalgıç', icon: '🤿', 
+      tabs: [
+        { title: 'Dalgıçlık', content: 'Antikythera dalgıçları, o dönemin kısıtlı imkanlarıyla (ağır metal başlıklar) 60 metre derinliğe inerek inanılmaz bir cesaret sergilediler.' },
+        { title: 'Ekipman', content: 'Eski tip hava pompalı kıyafetler kullanıldı. Bugün ise ileri teknoloji robotlar ve karışım gazlı tüplerle keşif devam ediyor.' }
+      ]
+    },
+    { 
+      id: 'konservator', name: 'Konservatör', icon: '🧪', 
+      tabs: [
+        { title: 'Konservasyon', content: 'Denizden çıkan eserlerin korozyona uğramaması için tuzdan arındırma ve kimyasal stabilizasyon süreçlerini yönetir.' },
+        { title: 'Restorasyon', content: 'Parçalanmış dişlileri mikroskop altında birleştirerek mekanizmanın formunu korumaya çalışır.' }
+      ]
+    },
+    { 
+      id: 'tarihci', name: 'Tarihçi', icon: '📜', 
+      tabs: [
+        { title: 'Yazıtlar', content: 'Mekanizma üzerindeki 3500’den fazla Yunanca karakteri okuyarak cihazın kullanım kılavuzunu çözer.' },
+        { title: 'Kültürel Miras', content: 'Yunan matematiği ve astronomisinin ulaştığı inanılmaz seviyeyi dünyaya anlatır.' }
+      ]
+    },
+    { 
+      id: 'muhendis', name: 'Mühendis', icon: '⚙️', 
+      tabs: [
+        { title: 'Mekanizma', content: '30’dan fazla bronz dişlinin nasıl birleştiğini ve Ay’ın hareketlerini nasıl milimetrik hesapladığını modeller.' },
+        { title: 'Analiz', content: 'Modern X-Ray (BT) taramalarıyla mekanizmanın iç yapısını bilgisayar ortamında yeniden canlandırır.' }
+      ]
+    },
+    { 
+      id: 'gazeteci', name: 'Gazeteci', icon: '🎤', 
+      tabs: [
+        { title: 'Haberleştirme', content: '1902’den bugüne bu keşfin dünya basınındaki yankısını ve bilimsel devrimini halka aktarır.' }
+      ]
+    }
+  ]
+};
 
-    <header class="p-8 flex justify-between items-center relative z-10">
-        <div class="border-l-4 border-[#b8860b] pl-4">
-            <h1 class="serif text-3xl tracking-tighter text-[#b8860b]">ΑΝΤΙΚΥΘΗΡΑ</h1>
-            <p class="text-[10px] tracking-[0.5em] uppercase opacity-50">Digital Heritage Project</p>
-        </div>
-        <div class="flex gap-4">
-            <button onclick="changeLang('gr')" class="text-xs hover:text-[#b8860b]">GR</button>
-            <button onclick="changeLang('en')" class="text-xs hover:text-[#b8860b]">EN</button>
-            <button onclick="changeLang('tr')" class="text-xs hover:text-[#b8860b]">TR</button>
-        </div>
-    </header>
+export default function AntikytheraFullApp() {
+  const [currentView, setCurrentView] = useState('intro'); // intro, menu, detail
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
 
-    <main class="flex flex-col items-center justify-center h-[70vh] text-center px-4 relative z-10">
-        <span id="hero-tag" class="serif text-[#b8860b] tracking-widest text-sm mb-4">150 π.Χ. — Ο ΠΡΩΤΟΣ ΥΠΟΛΟΓΙΣΤΗΣ</span>
-        <h2 id="hero-title" class="serif text-5xl lg:text-8xl mb-8 leading-none">ΕΞΕΡΕΥΝΗΣΤΕ ΤΟ <br> ΜΗΧΑΝΙΣΜΟ</h2>
-        
-        <div class="flex flex-wrap justify-center gap-6 mt-4">
-            <button onclick="openModal('discovery')" class="btn-main px-12 py-5 text-sm uppercase tracking-widest">
-                <span id="btn-1">ΑΝΑΚΑΛΥΨΗ</span>
-            </button>
-            <button onclick="openModal('mechanism')" class="btn-main px-12 py-5 text-sm uppercase tracking-widest">
-                <span id="btn-2">ΜΗΧΑΝΙΣΜΟΣ</span>
-            </button>
-        </div>
-    </main>
+  // --- EKRAN 1: GİRİŞ ---
+  const IntroScreen = () => (
+    <LinearGradient colors={[COLORS.bg, '#25104A']} style={styles.flexCenter}>
+      <View style={styles.mainCircle}>
+        <Text style={{fontSize: 60}}>⚙️</Text>
+      </View>
+      <Text style={styles.titleLg}>ANTIKYTHERA</Text>
+      <Text style={styles.descText}>Mekanizmanın Gizemlerine Yolculuk</Text>
+      <TouchableOpacity 
+        style={styles.btnGold} 
+        onPress={() => setCurrentView('menu')}
+      >
+        <Text style={styles.btnText}>GİRİŞ YAP</Text>
+      </TouchableOpacity>
+      <View style={styles.langRow}>
+        <Text style={styles.langText}>Türkçe</Text>
+        <Text style={[styles.langText, {opacity: 0.5}]}>English</Text>
+      </View>
+    </LinearGradient>
+  );
 
-    <div id="modal-discovery" class="modal" onclick="closeModal()">
-        <div class="modal-content text-left" onclick="event.stopPropagation()">
-            <h3 id="m1-title" class="serif text-3xl text-[#b8860b] mb-4">Το Ναυάγιο (1901)</h3>
-            <p id="m1-text" class="text-gray-400 leading-relaxed mb-6">
-                Το 1900, Συμιακοί σφουγγαράδες ανακάλυψαν τυχαία ένα αρχαίο ναυάγιο στα Αντικύθηρα. Μεταξύ των θησαυρών ήταν ένας διαβρωμένος χάλκινος όγκος που θα άλλαζε την ιστορία της τεχνολογίας για πάντα.
-            </p>
-            <button onclick="closeModal()" class="text-[#b8860b] text-sm font-bold uppercase tracking-widest border border-[#b8860b] px-6 py-2 rounded-full hover:bg-[#b8860b] hover:text-black transition">ΚΛΕΙΣΙΜΟ</button>
-        </div>
-    </div>
+  // --- EKRAN 2: ANA MENÜ ---
+  const MenuScreen = () => (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={{padding: 20}}>
+        <Text style={styles.menuHeader}>Bir Uzmanlık Seç</Text>
+        <View style={styles.grid}>
+          {DATA.roles.map((item) => (
+            <TouchableOpacity 
+              key={item.id} 
+              style={styles.menuItem}
+              onPress={() => { setSelectedRole(item); setActiveTab(0); setCurrentView('detail'); }}
+            >
+              <View style={styles.itemCircle}>
+                <Text style={{fontSize: 35}}>{item.icon}</Text>
+              </View>
+              <Text style={styles.itemName}>{item.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 
-    <div id="modal-mechanism" class="modal" onclick="closeModal()">
-        <div class="modal-content text-left" onclick="event.stopPropagation()">
-            <h3 id="m2-title" class="serif text-3xl text-[#b8860b] mb-4">Η Τεχνολογία</h3>
-            <p id="m2-text" class="text-gray-400 leading-relaxed mb-6">
-                Ο Μηχανισμός αποτελείται από τουλάχιστον 30 χάλκινα γρανάζια. Χρησιμοποιήθηκε για τον υπολογισμό των κινήσεων του Ήλιου, της Σελήνης και των πέντε γνωστών πλανητών, καθώς και για την πρόβλεψη εκλείψεων.
-            </p>
-            <button onclick="closeModal()" class="text-[#b8860b] text-sm font-bold uppercase tracking-widest border border-[#b8860b] px-6 py-2 rounded-full hover:bg-[#b8860b] hover:text-black transition">ΚΛΕΙΣΙΜΟ</button>
-        </div>
-    </div>
+  // --- EKRAN 3: DETAYLAR VE AKORDEON ---
+  const DetailScreen = () => (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.detailHeader}>
+        <TouchableOpacity onPress={() => setCurrentView('menu')}>
+          <Text style={styles.goldText}>← Menü</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{selectedRole.name}</Text>
+        <View style={{width: 40}} />
+      </View>
 
-    <script>
-        const content = {
-            gr: {
-                tag: "150 π.Χ. — Ο ΠΡΩΤΟΣ ΥΠΟΛΟΓΙΣΤΗΣ",
-                title: "ΕΞΕΡΕΥΝΗΣΤΕ ΤΟ <br> ΜΗΧΑΝΙΣΜΟ",
-                btn1: "ΑΝΑΚΑΛΥΨΗ", btn2: "ΜΗΧΑΝΙΣΜΟΣ",
-                m1T: "Το Ναυάγιο (1901)", m1P: "Το 1900, Συμιακοί σφουγγαράδες ανακάλυψαν τυχαία ένα αρχαίο ναυάγιο...",
-                m2T: "Η Τεχνολογία", m2P: "Ο Μηχανισμός αποτελείται από τουλάχιστον 30 χάλκινα γρανάζια..."
-            },
-            tr: {
-                tag: "M.Ö. 150 — İLK BİLGİSAYAR",
-                title: "MEKANİZMAYI <br> KEŞFEDİN",
-                btn1: "KEŞİF SÜRECİ", btn2: "TEKNOLOJİ",
-                m1T: "Gemi Batığı (1901)", m1P: "1900 yılında sünger avcıları tarafından Antikythera adası yakınlarında bulundu...",
-                m2T: "Mekanizma Yapısı", m2P: "En az 30 bronz dişliden oluşan bu yapı, astronomik olayları hesaplamak için kullanılıyordu..."
-            },
-            en: {
-                tag: "150 B.C. — THE FIRST COMPUTER",
-                title: "EXPLORE THE <br> MECHANISM",
-                btn1: "DISCOVERY", btn2: "MECHANISM",
-                m1T: "The Shipwreck (1901)", m1P: "In 1900, sponge divers accidentally discovered an ancient shipwreck off Antikythera...",
-                m2T: "The Technology", m2P: "The Mechanism consists of at least 30 bronze gears used to calculate solar and lunar cycles..."
-            }
-        };
+      <ScrollView contentContainerStyle={{padding: 20}}>
+        <View style={styles.detailHero}>
+           <View style={styles.heroCircle}>
+              <Text style={{fontSize: 50}}>{selectedRole.icon}</Text>
+           </View>
+        </View>
 
-        function changeLang(lang) {
-            document.getElementById('hero-tag').innerHTML = content[lang].tag;
-            document.getElementById('hero-title').innerHTML = content[lang].title;
-            document.getElementById('btn-1').innerText = content[lang].btn1;
-            document.getElementById('btn-2').innerText = content[lang].btn2;
-            document.getElementById('m1-title').innerText = content[lang].m1T;
-            document.getElementById('m1-text').innerText = content[lang].m1P;
-            document.getElementById('m2-title').innerText = content[lang].m2T;
-            document.getElementById('m2-text').innerText = content[lang].m2P;
-        }
+        {selectedRole.tabs.map((tab, index) => (
+          <View key={index} style={styles.accordionBox}>
+            <TouchableOpacity 
+              style={styles.accordionHeader}
+              onPress={() => setActiveTab(activeTab === index ? -1 : index)}
+            >
+              <Text style={styles.tabTitle}>{tab.title.toUpperCase()}</Text>
+              <Text style={styles.goldText}>{activeTab === index ? '▲' : '▼'}</Text>
+            </TouchableOpacity>
+            
+            {activeTab === index && (
+              <View style={styles.accordionContent}>
+                <Text style={styles.tabContentText}>{tab.content}</Text>
+                {index === 1 && ( // Eğer 'Dönem' seçiliyse temsili buton ekle
+                  <TouchableOpacity style={styles.miniBtn}>
+                    <Text style={styles.miniBtnText}>AS PAIZOUME (OYNA)</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+  );
 
-        function openModal(type) { document.getElementById('modal-' + type).classList.add('active'); }
-        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
-    </script>
-</body>
-</html>
+  return (
+    <View style={{flex: 1, backgroundColor: COLORS.bg}}>
+      <StatusBar barStyle="light-content" />
+      {currentView === 'intro' && <IntroScreen />}
+      {currentView === 'menu' && <MenuScreen />}
+      {currentView === 'detail' && <DetailScreen />}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  flexCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 },
+  
+  // Intro
+  mainCircle: {
+    width: 140, height: 140, borderRadius: 70, backgroundColor: COLORS.panel,
+    borderWidth: 3, borderColor: COLORS.gold, alignItems: 'center', justifyContent: 'center',
+    marginBottom: 20, shadowColor: COLORS.gold, shadowOpacity: 0.5, shadowRadius: 20, elevation: 15
+  },
+  titleLg: { color: COLORS.gold, fontSize: 36, fontWeight: '900', letterSpacing: 5 },
+  descText: { color: COLORS.textSub, fontSize: 16, marginTop: 10, marginBottom: 40 },
+  btnGold: {
+    backgroundColor: COLORS.gold, paddingVertical: 15, paddingHorizontal: 50, borderRadius: 40,
+    shadowColor: COLORS.gold, shadowOpacity: 0.4, shadowRadius: 10
+  },
+  btnText: { color: COLORS.bg, fontWeight: 'bold', fontSize: 18 },
+  langRow: { flexDirection: 'row', marginTop: 30 },
+  langText: { color: COLORS.textMain, marginHorizontal: 15, fontWeight: '600' },
+
+  // Menu
+  menuHeader: { color: COLORS.textMain, fontSize: 24, fontWeight: 'bold', marginVertical: 20, textAlign: 'center' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  menuItem: {
+    width: (width / 2) - 30, backgroundColor: COLORS.panel, borderRadius: 25,
+    padding: 20, alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: COLORS.border
+  },
+  itemCircle: {
+    width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.bg,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 12,
+    borderWidth: 1, borderColor: 'rgba(255,215,0,0.1)'
+  },
+  itemName: { color: COLORS.textMain, fontWeight: '700', fontSize: 16 },
+
+  // Detail
+  detailHeader: { 
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
+    padding: 20, borderBottomWidth: 1, borderBottomColor: COLORS.border 
+  },
+  headerTitle: { color: COLORS.textMain, fontSize: 20, fontWeight: 'bold' },
+  goldText: { color: COLORS.gold, fontWeight: 'bold' },
+  detailHero: { alignItems: 'center', marginVertical: 30 },
+  heroCircle: {
+    width: 120, height: 120, borderRadius: 60, backgroundColor: COLORS.panel,
+    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: COLORS.gold,
+    shadowColor: COLORS.gold, shadowOpacity: 0.3, shadowRadius: 15
+  },
+  accordionBox: { backgroundColor: COLORS.panel, borderRadius: 15, marginBottom: 10, overflow: 'hidden' },
+  accordionHeader: { 
+    flexDirection: 'row', justifyContent: 'space-between', padding: 20, 
+    alignItems: 'center', borderBottomWidth: 0.5, borderBottomColor: 'rgba(255,255,255,0.05)' 
+  },
+  tabTitle: { color: COLORS.gold, fontWeight: '800', fontSize: 14, letterSpacing: 1 },
+  accordionContent: { padding: 20, backgroundColor: 'rgba(0,0,0,0.2)' },
+  tabContentText: { color: COLORS.textSub, lineHeight: 24, fontSize: 16 },
+  miniBtn: { 
+    marginTop: 20, backgroundColor: 'transparent', borderWidth: 1, borderColor: COLORS.gold, 
+    padding: 12, borderRadius: 10, alignItems: 'center' 
+  },
+  miniBtnText: { color: COLORS.gold, fontWeight: 'bold', fontSize: 12 }
+});
+          
