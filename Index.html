@@ -1,0 +1,65 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+
+const ARCHEO_STORY = [
+  { era: 'M.Ö. 450', title: 'Tapınak İnşası', description: 'Bu dönemde sütunlar antik tekniklerle yerleştirildi.', audioGuide: 'era1.mp3' },
+  { era: 'M.S. 120', title: 'Roma Dönemi Genişlemesi', description: 'Kent merkezi yeni hamamlar ve tiyatro ile büyütüldü.', audioGuide: 'era2.mp3' },
+  { era: '1990', title: 'İlk Modern Kazılar', description: 'Arkeologlar ana sunağı bu tarihte gün yüzüne çıkardı.', audioGuide: 'era3.mp3' },
+  { era: 'Bugün', title: 'Restorasyon Süreci', description: 'Dijital tarama teknolojileriyle eserler korunuyor.', audioGuide: 'era4.mp3' },
+];
+
+export default function TimelineApp() {
+  const [selectedEra, setSelectedEra] = useState(0);
+
+  return (
+    <View style={styles.container}>
+      {/* Üst Kısım: İnteraktif Zaman Çizelgesi */}
+      <View style={styles.timelineContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timelineHeader}>
+          {ARCHEO_STORY.map((item, index) => (
+            <TouchableOpacity key={index} onPress={() => setSelectedEra(index)} style={[styles.eraDot, selectedEra === index && styles.activeEraDot]}>
+              <Text style={[styles.eraText, selectedEra === index && styles.activeEraText]}>{item.era}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Orta Kısım: Eğitim İçeriği Kartı */}
+      <View style={styles.contentCard}>
+        <Text style={styles.eraBadge}>Dönem: {ARCHEO_STORY[selectedEra].era}</Text>
+        <Text style={styles.title}>{ARCHEO_STORY[selectedEra].title}</Text>
+        <Text style={styles.description}>{ARCHEO_STORY[selectedEra].description}</Text>
+        
+        {/* Sesli Rehber (Eğitim Amaçlı Anlatım) */}
+        <TouchableOpacity style={styles.audioButton}>
+          <Text style={styles.audioButtonText}>🎧 Uzman Anlatımını Dinle</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Alt Kısım: "Bunu Biliyor Muydunuz?" (Eğitim Katmanı) */}
+      <View style={styles.factBox}>
+        <Text style={styles.factTitle}>💡 Arkeolojik Detay</Text>
+        <Text style={styles.factText}>Bu bölgedeki kazılarda kullanılan teknikler, çevredeki diğer alanlardan %30 daha eskidir.</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#fcfaf5', paddingTop: 60 }, // Müze kağıdı rengi
+  timelineContainer: { height: 80, borderBottomWidth: 1, borderColor: '#e0d6c5' },
+  timelineHeader: { paddingHorizontal: 20, alignItems: 'center' },
+  eraDot: { paddingHorizontal: 20, paddingVertical: 10, marginRight: 15, borderRadius: 20, backgroundColor: '#eee' },
+  activeEraDot: { backgroundColor: '#8b5a2b' }, // Toprak rengi
+  eraText: { color: '#888', fontWeight: 'bold' },
+  activeEraText: { color: '#fff' },
+  contentCard: { margin: 20, padding: 25, backgroundColor: '#fff', borderRadius: 20, elevation: 10 },
+  eraBadge: { color: '#8b5a2b', fontWeight: 'bold', marginBottom: 10 },
+  title: { fontSize: 26, fontWeight: 'bold', color: '#333', marginBottom: 15 },
+  description: { fontSize: 16, lineHeight: 24, color: '#666' },
+  audioButton: { marginTop: 25, backgroundColor: '#2c3e50', padding: 15, borderRadius: 12, alignItems: 'center' },
+  audioButtonText: { color: '#fff', fontWeight: 'bold' },
+  factBox: { margin: 20, padding: 15, backgroundColor: '#e8f4f8', borderRadius: 10, borderLeftWidth: 5, borderColor: '#3498db' },
+  factTitle: { fontWeight: 'bold', color: '#2980b9', marginBottom: 5 },
+  factText: { color: '#444', fontStyle: 'italic' }
+});
